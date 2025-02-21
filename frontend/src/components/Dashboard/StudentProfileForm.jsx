@@ -59,7 +59,6 @@ const StudentProfileForm = () => {
         formDataToSend.append("profilePic", formData.profilePic);
         formDataToSend.append("displayName", formData.displayName);
         formDataToSend.append("dob", formData.dob);
-        formDataToSend.append("preference", formData.preference);
 
         try {
             const response = await axios.post(url, formDataToSend, { withCredentials: true });
