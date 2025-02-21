@@ -59,7 +59,7 @@ const Navbar = () => {
             >
               <Link to="/register">
                 <button className="flex items-center justify-center text-sm bg-blue-950 text-white p-5 h-8 w-34 rounded-xl font-medium">
-                  <p>Join now</p>
+                  <p>Register</p>
                 </button>
               </Link>
             </motion.div>
