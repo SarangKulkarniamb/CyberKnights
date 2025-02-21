@@ -1,8 +1,8 @@
 import mongoose from "mongoose";
 
-const studentProfileSchema = new mongoose.Schema(
+const ProfileSchema = new mongoose.Schema(
     {
-        studentId: {
+        userid: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
             required: true,
@@ -24,9 +24,8 @@ const studentProfileSchema = new mongoose.Schema(
             required: true,
         },  
 
-        preference: { type: String, enum: ['Veg', 'Non-Veg'], required: true },
     },
     { timestamps: true }
 );
 
-export const StudentProfile = mongoose.model("StudentProfile", studentProfileSchema);
+export const Profile = mongoose.model("StudentProfile", ProfileSchema);

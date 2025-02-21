@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
-import Sidebar from '../components/DashboardStudent/Sidebar'
-import Nav from '../components/DashboardStudent/Nav'
+import Sidebar from '../components/Dashboard/Sidebar'
+import Nav from '../components/Dashboard/Nav'
 import { Outlet } from 'react-router-dom'
 
 const DashboardStudent = () => {

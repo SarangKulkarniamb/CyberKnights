@@ -1,11 +1,11 @@
 import express from 'express'
-import { studentProfileUpload } from '../controllers/profile/studentProfile.controller.js'
-import {authMiddleware , roleMiddleware} from '../middleware/authmiddleware.js'
+import { ProfileUpload } from '../controllers/profile/Profile.controller.js'
+import {authMiddleware} from '../middleware/authmiddleware.js'
 
 import {upload} from '../cloudinary/cloudinary.js'
 
 const router = express.Router()
 
-router.post('/profile-upload',authMiddleware, upload.single('profilePic'),roleMiddleware(['Student']), studentProfileUpload)
+router.post('/profile-upload',authMiddleware, upload.single('profilePic'), ProfileUpload)
     
 export default router

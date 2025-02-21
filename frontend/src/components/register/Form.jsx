@@ -9,18 +9,13 @@ import axios from "axios"
 import {toast , Toaster} from "react-hot-toast" // Import toast for notifications
 import { useNavigate } from "react-router-dom"
 
-
-export const Form = ({ role, url }) => {
+export const Form = ({ url }) => {
   // form data object
   const [form, setForm] = useState({
     username: "",
     password: "",
     email: "",
-    role,
   })
-  useEffect(() => {
-    setForm((prevForm) => ({ ...prevForm, role })); // Update role when prop changes
-  }, [role]);
 
   // useful states
   const [score, setScore] = useState(0)
@@ -69,7 +64,7 @@ export const Form = ({ role, url }) => {
 
   // form validation
   const validateForm = () => {
-    if (!form.username || !form.email || !form.password || !form.role) {
+    if (!form.username || !form.email || !form.password) {
       toast.error("All fields are required.")
       return false
     }
@@ -132,7 +127,7 @@ export const Form = ({ role, url }) => {
           exit={{ opacity: 0, x: 50 }}
           className="p-10 bg-white flex flex-col items-center rounded-lg shadow-md space-y-4"
         >
-          <h2 className="text-xl font-bold text-gray-700">{role}</h2>
+          <h2 className="text-xl font-bold text-gray-700">Register</h2>
           <form onSubmit={handleSubmit} className="flex flex-col items-center">
             <Input
               icon={User}
@@ -181,27 +176,6 @@ export const Form = ({ role, url }) => {
                 <h1>Password Strength:</h1>
                 <p className={`${getFeedbackColor()} font-semibold`}>{feedback}</p>
               </div>
-
-              <ul className="flex flex-col mt-4 text-sm gap-2" style={{ minWidth: "350px" }}>
-                {/* Password Strength Criteria */}
-                {[
-                  { check: form.password.length > 8, message: "Contains enough characters" },
-                  { check: /[a-z]/.test(form.password), message: "Contains lowercase letters" },
-                  { check: /[A-Z]/.test(form.password), message: "Contains uppercase letters" },
-                  { check: /\d/.test(form.password), message: "Contains numbers" },
-                  { check: /[^A-Za-z0-9]/.test(form.password), message: "Contains special characters" },
-                ].map((item, index) => (
-                  <li
-                    key={index}
-                    className={`flex items-center ${item.check ? "text-green-400" : "text-gray-400"}`}
-                  >
-                    <div className="w-6">
-                      {item.check ? <Check className="mr-2" /> : <X className="mr-2" />}
-                    </div>
-                    <span>{item.check ? item.message : `Password should have ${item.message.toLowerCase()}`}</span>
-                  </li>
-                ))}
-              </ul>
             </div>
           </form>
         </motion.div>

@@ -20,7 +20,7 @@ app.get('/', (req, res) => {
 })
 
 app.use("/api/auth", userAuthRouter)
-app.use("/api/student",studentProfile)
+app.use("/api/profile",studentProfile)
 
 app.listen(PORT, () => {
     console.log("connecting to database...")

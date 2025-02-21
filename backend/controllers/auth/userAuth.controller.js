@@ -9,9 +9,9 @@ import jwt from 'jsonwebtoken';
 
 export const register = async (req, res) => {
 
-    const { email, username , password ,role} = req.body
+    const { email, username , password} = req.body
     try {
-        if(!email || !username || !password || !role){
+        if(!email || !username || !password){
             return res.status(400).json({message: 'Please enter all fields'})
         }
          if(isValidEmail(email) === false){
@@ -34,7 +34,6 @@ export const register = async (req, res) => {
         email,
         username,
         password: hashedPassword,
-        role,
         verificationToken,
         verificationTokenExpiresAt: Date.now() + 1*60*60*1000  //verification token expires in 1 hour
     })
