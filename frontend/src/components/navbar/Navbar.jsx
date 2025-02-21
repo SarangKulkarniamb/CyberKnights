@@ -48,7 +48,7 @@ const Navbar = () => {
             >
               <Link to="/login">
                 <button className="flex items-center justify-center text-sm bg-white text-black p-5 h-8 w-24 rounded-xl border">
-                  <p>Login</p>
+                  <p>Login kro bhai</p>
                 </button>
               </Link>
             </motion.div>
