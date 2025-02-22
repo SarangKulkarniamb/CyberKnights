@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { Toaster,toast } from 'react-hot-toast'
 import {motion} from 'framer-motion'
 import Input from '../register/Input'
-import {User,Lock} from 'lucide-react'
+import {User,Lock, CloudHail, CloudCog} from 'lucide-react'
 import {Link} from 'react-router-dom'
 import axios from 'axios'
 import {useSetRecoilState} from 'recoil'
@@ -46,6 +46,7 @@ export const Loginform =() =>{
         }, 2000);
       }
     } catch (error) {
+      console.log(error.message)
       toast.error(error?.response?.data?.message || 'There was an error logging in.');
     } finally {
       setLoading(false);

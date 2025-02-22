@@ -5,13 +5,13 @@ import Registerpage from './pages/Registerpage'
 import Verification from './pages/Verification'
 import Dashboard from './pages/Dashboard'
 import MainBody from './components/Dashboard/MainBody'
-import StudentProfileForm from './components/Dashboard/StudentProfileForm'
 import Unauthorized from './pages/Unauthorized'
 import { useRecoilValue } from 'recoil'
 import { authState } from './atoms/authAtom'
 import CheckAuthStatus from './components/helper/CheckAuthStatus'
 import Logout from './components/helper/Logout'
-
+import {CreateTimeCapsule} from './components/Dashboard/CreateTimeCapsule'
+import {ProfileView} from './components/Dashboard/ProfileView'
 // Protected route component
 const Protected = ({ children, isPublic = false }) => {
   const auth = useRecoilValue(authState);
@@ -44,7 +44,9 @@ const App = () => {
         {/* Protected Dashboard Route with Nested Routes */}
         <Route path="/dashboard" element={<Protected><Dashboard /></Protected>}>
           <Route path="" element={<MainBody />} />
-          <Route path="profile" element={<StudentProfileForm />} />
+          <Route path="profile" element={<ProfileView />} />
+          <Route path="create-capsule" element={<CreateTimeCapsule/>} />
+
         </Route>
         
         <Route path="/logout" element={<Protected><Logout /></Protected>} />

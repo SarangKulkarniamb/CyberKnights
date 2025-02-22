@@ -6,7 +6,7 @@ const CapsuleSchema = new mongoose.Schema(
             type: String,
             required: true, 
         },
-        Banner: {
+        banner: {
             type: String,
             required: true,
         },
@@ -14,13 +14,16 @@ const CapsuleSchema = new mongoose.Schema(
             type: String,
             required: true,
         },
-        Contributers: {
-            type: [mongoose.Schema.Types.ObjectId],
-            required: true,
-        },
         Admin: {
             type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
             required: true,
+        },
+        viewRights: { 
+            type: String, 
+            enum: ["public", "onlyMe", "specificPeople"], 
+            default: "onlyMe",
+            required: true
         },
     },
     { timestamps: true } 

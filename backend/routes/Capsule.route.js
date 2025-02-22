@@ -6,6 +6,6 @@ import {upload} from '../cloudinary/cloudinary.js'
 
 const router = express.Router()
 
-router.post('/Capsule-upload',authMiddleware, upload.single('Banner'), CapsuleUpload)
+router.post('/Capsule-upload',authMiddleware, upload.single('banner'), CapsuleUpload)
     
 export default router
