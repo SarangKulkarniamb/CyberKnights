@@ -1,14 +1,17 @@
 import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast, { Toaster } from "react-hot-toast";
 import axios from "axios";
-import { useMutation } from "@tanstack/react-query";
 
-const StudentProfileUpload = () => {
+export const StudentProfileForm = ({ onSuccess }) => {
     const url = `${import.meta.env.VITE_PROFILE_API_URL}/profile-upload`;
+    const queryClient = useQueryClient();
+
     const [formData, setFormData] = useState({
-        displayName: "",
+        name: "",
         profilePic: null,
         dob: "",
+        bio: "",
     });
 
     const mutation = useMutation({
@@ -18,13 +21,15 @@ const StudentProfileUpload = () => {
         },
         onSuccess: (data) => {
             if (data.success) {
-                toast.success("Profile Uploaded successfully!");
+                toast.success("Profile updated successfully!");
+                queryClient.invalidateQueries(["profile"]); // Refresh profile
+                onSuccess(); // Close form and show updated profile
             } else {
                 toast.error(data.message);
             }
         },
         onError: (error) => {
-            console.error("Error uploading profile:", error.message);
+            console.error("Error updating profile:", error.message);
             toast.error(error?.response?.data?.message || "There was an error.");
         }
     });
@@ -40,41 +45,33 @@ const StudentProfileUpload = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-
         const formDataToSend = new FormData();
-        formDataToSend.append("profilePic", formData.profilePic);
-        formDataToSend.append("displayName", formData.displayName);
-        formDataToSend.append("dob", formData.dob);
+        if (formData.profilePic) formDataToSend.append("profilePic", formData.profilePic);
+        if (formData.name) formDataToSend.append("name", formData.name);
+        if (formData.dob) formDataToSend.append("dob", formData.dob);
+        if (formData.bio) formDataToSend.append("bio", formData.bio);
 
         mutation.mutate(formDataToSend);
     };
 
     return (
-        <div className="max-w-md mx-auto p-6 bg-white shadow-md rounded-lg">
+        <div className="p-6 bg-white shadow-md rounded-lg">
             <Toaster />
-            <h2 className="text-2xl font-bold mb-6 text-center">Upload Profile</h2>
+            <h2 className="text-xl font-bold mb-4">Edit Profile</h2>
             <form onSubmit={handleSubmit}>
                 <div className="mb-4">
                     <label className="block text-sm font-medium text-gray-700">Profile Picture</label>
-                    <input
-                        type="file"
-                        name="profilePic"
-                        onChange={handleFileChange}
-                        className="mt-1 block w-full text-sm text-gray-900 border border-gray-300 rounded-md cursor-pointer focus:outline-none"
-                        accept="image/*"
-                        required
-                    />
+                    <input type="file" name="profilePic" onChange={handleFileChange} accept="image/*" />
                 </div>
 
                 <div className="mb-4">
                     <label className="block text-sm font-medium text-gray-700">Display Name</label>
                     <input
                         type="text"
-                        name="displayName"
-                        value={formData.displayName}
+                        name="name"
+                        value={formData.name}
                         onChange={handleChange}
-                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                        required
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md"
                     />
                 </div>
 
@@ -85,23 +82,30 @@ const StudentProfileUpload = () => {
                         name="dob"
                         value={formData.dob}
                         onChange={handleChange}
-                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                        required
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md"
                     />
                 </div>
 
-                <div className="flex justify-center">
-                    <button
-                        type="submit"
-                        className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                        disabled={mutation.isPending}
-                    >
-                        {mutation.isPending ? "Uploading..." : "Upload"}
+                <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700">Bio</label>
+                    <textarea
+                        name="bio"
+                        value={formData.bio}
+                        onChange={handleChange}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                        rows="3"
+                    />
+                </div>
+
+                <div className="flex gap-2">
+                    <button type="submit" className="px-4 py-2 bg-indigo-600 text-white rounded-md">
+                        {mutation.isPending ? "Updating..." : "Save"}
+                    </button>
+                    <button type="button" onClick={onSuccess} className="px-4 py-2 bg-gray-500 text-white rounded-md">
+                        Cancel
                     </button>
                 </div>
             </form>
         </div>
     );
 };
-
-export default StudentProfileUpload;

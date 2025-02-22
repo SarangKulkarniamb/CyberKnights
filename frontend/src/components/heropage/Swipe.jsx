@@ -5,9 +5,9 @@ import "slick-carousel/slick/slick-theme.css";
 import { IoMdArrowDropleftCircle, IoMdArrowDroprightCircle } from "react-icons/io";
 import { motion } from "framer-motion";
 import heroImage from "../../assets/heroimage.png";
-import Image1 from "../../assets/image1.png";
-import Image2 from "../../assets/image2.png";
-import Image3 from "../../assets/image3.png";
+import Image1 from "../../assets/image1.jpg";
+import Image2 from "../../assets/image2.jpg";
+import Image3 from "../../assets/image3.jpg";
 const SwipeSection = () => {
   const sliderRef = useRef(null);
 
