@@ -25,6 +25,18 @@ const CapsuleSchema = new mongoose.Schema(
             default: "onlyMe",
             required: true
         },
+        access: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "User",
+            },
+        ],
+        requests: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "User",
+            },
+        ],
     },
     { timestamps: true } 
 );

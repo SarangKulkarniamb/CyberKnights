@@ -9,4 +9,5 @@ const router = express.Router()
 router.post('/Capsule-upload',authMiddleware, upload.single('banner'), CapsuleUpload)
 router.get('/getCapsules', authMiddleware,getCapsules)
 router.get('/:id', authMiddleware, getCapsule)
+
 export default router
