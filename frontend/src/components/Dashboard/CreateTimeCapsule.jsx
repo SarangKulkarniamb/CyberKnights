@@ -69,6 +69,10 @@ export const CreateTimeCapsule = () => {
           headers: { "Content-Type": "multipart/form-data" },
           withCredentials: true,
         });
+
+        // Simulate a 2-second delay for testing
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+
         console.log("API Response:", response.data); // Debugging log
         return response.data;
       } catch (error) {
@@ -105,6 +109,8 @@ export const CreateTimeCapsule = () => {
 
     createCapsuleMutation.mutate(formData);
   };
+
+  console.log("Mutation isLoading:", createCapsuleMutation.isLoading); // Debugging log
 
   return (
     <div className="max-w-2xl mx-auto p-6 bg-white shadow-md rounded-lg mt-10">

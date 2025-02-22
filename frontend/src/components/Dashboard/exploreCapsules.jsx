@@ -101,7 +101,11 @@ export const ExploreCapsules = () => {
                     {capsule.CapsuleName}
                   </h3>
                 </Link>
-                <p className="text-gray-600 text-lg">{capsule.Description}</p>
+
+                  <p className="text-gray-600">{capsule.Description}</p>
+                  <p className="text-gray-600" > {capsule.viewRights}</p>
+                </div>
+
               </div>
             );
           })

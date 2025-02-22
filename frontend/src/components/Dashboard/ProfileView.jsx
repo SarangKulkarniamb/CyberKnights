@@ -36,7 +36,15 @@ export const ProfileView = () => {
     });
 
     if (isLoading) return <div>Loading...</div>;
-    if (error) return <div>Error loading profile</div>;
+
+    if (!profile) {
+        return (
+            <div className="max-w-md mx-auto mt-10 p-6 bg-white shadow-md rounded-lg">
+                <Toaster />
+                <ProfileEditForm profile={null} mutation={mutation} onCancel={() => setIsEditing(false)} />
+            </div>
+        );
+    }
 
     return (
         <div className="max-w-md mx-auto mt-10 p-6 bg-white shadow-md rounded-lg">
