@@ -3,14 +3,14 @@ import { Profile } from '../../models/profile.model.js'
 
 export const ProfileUpload = async function(req, res) {
     try {
-        const { dob, displayName } = req.body; // Use displayName directly
+        const { dob, name } = req.body;
         const profilePic = req.file?.path || 'https://res.cloudinary.com/dqcsk8rsc/image/upload/v1633458672/default-profile-picture-300x300_vbqz7c.png';
 
         const userid = req.userId;
 
         const profile = await Profile.findOneAndUpdate(
             { userid },
-            { userid, dob, profilePic, displayName },
+            { userid, dob, profilePic, displayName: name },
             { new: true, upsert: true, runValidators: true }
         );
 

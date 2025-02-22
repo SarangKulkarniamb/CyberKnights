@@ -22,10 +22,13 @@ const ProfileSchema = new mongoose.Schema(
         dob: {
             type: Date,
             required: true,
-        },  
-
+        },
+        bio: {
+            type: String,
+            required: true,
+        },
     },
     { timestamps: true }
 );
 
-export const Profile = mongoose.model("Profile", ProfileSchema);
+export const Profile = mongoose.model("StudentProfile", ProfileSchema);
