@@ -12,7 +12,7 @@ import CheckAuthStatus from './components/helper/CheckAuthStatus'
 import Logout from './components/helper/Logout'
 import {CreateTimeCapsule} from './components/Dashboard/CreateTimeCapsule'
 import {ProfileView} from './components/Dashboard/ProfileView'
-import { ExploreCapsules } from './components/Dashboard/exploreCapsules'
+import { ExploreCapsules } from './components/Dashboard/ExploreCapsules'
 import { CapsuleDetails } from './components/Dashboard/CapsuleDetails'
 // Protected route component
 const Protected = ({ children, isPublic = false }) => {
