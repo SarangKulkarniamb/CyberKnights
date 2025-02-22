@@ -5,6 +5,7 @@ import { connectDB } from './db/connectDB.js'
 import userAuthRouter from './routes/userAuth.route.js'
 import cookieParser from 'cookie-parser'
 import studentProfile from './routes/studentProfile.route.js'
+import capsuleRouter from './routes/Capsule.route.js'
 
 dotenv.config()
 
@@ -21,7 +22,7 @@ app.get('/', (req, res) => {
 
 app.use("/api/auth", userAuthRouter)
 app.use("/api/profile",studentProfile)
-
+app.use("/api/capsule" , capsuleRouter)
 app.listen(PORT, () => {
     console.log("connecting to database...")
     connectDB()
