@@ -21,8 +21,8 @@ const CapsuleSchema = new mongoose.Schema(
         },
         viewRights: { 
             type: String, 
-            enum: ["public", "onlyMe", "specificPeople"], 
-            default: "onlyMe",
+            enum: ["public","onlyMe","specificPeople"], 
+            default: "specificPeople",
             required: true
         },
         access: [

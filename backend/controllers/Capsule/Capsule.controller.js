@@ -1,5 +1,7 @@
 import { Capsule } from "../../models/Capsule.model.js";
 import { Profile } from "../../models/profile.model.js";
+
+
 export const CapsuleUpload = async (req, res) => {
   try {
     const { Description, CapsuleName, viewRights } = req.body;

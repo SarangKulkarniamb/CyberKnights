@@ -106,7 +106,7 @@ export const ExploreCapsules = () => {
                   <p className="text-gray-600" > {capsule.viewRights}</p>
                 </div>
 
-              </div>
+              
             );
           })
         )}
