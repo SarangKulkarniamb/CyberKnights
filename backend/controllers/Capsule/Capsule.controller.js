@@ -45,3 +45,47 @@ export const CapsuleUpload = async (req, res) => {
         });
     }
 };
+
+
+export const getCapsules = async (req, res) => {
+    try {
+      const { page = 1, limit = 10 } = req.query;
+      const pageNumber = parseInt(page, 10);
+      const limitNumber = parseInt(limit, 2);
+  
+      const capsules = await Capsule.find({ viewRights: "public" })
+        .sort({ createdAt: -1 })
+        .skip((pageNumber - 1) * limitNumber)
+        .limit(limitNumber);
+  
+      const totalCapsules = await Capsule.countDocuments({ viewRights: "public" });
+  
+      res.status(200).json({
+        success: true,
+        capsules,
+        hasMore: pageNumber * limitNumber < totalCapsules,
+      });
+    } catch (error) {
+      console.error("Error fetching capsules:", error);
+      res.status(500).json({
+        success: false,
+        message: "Failed to fetch capsules",
+      });
+    }
+  };
+
+export const getCapsulesall = async (req, res) => {
+    try {
+        const capsules = await Capsule.find();
+        res.status(200).json({
+            success: true,
+            capsules,
+        });
+    } catch (error) {
+        console.error('Error fetching capsules:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to fetch capsules',
+        });
+    }
+}
