@@ -22,8 +22,10 @@ const ProfileSchema = new mongoose.Schema(
         dob: {
             type: Date,
             required: true,
-        },  
-
+        },
+        bio: {
+        type: String,
+            required: true,
     },
     { timestamps: true }
 );
