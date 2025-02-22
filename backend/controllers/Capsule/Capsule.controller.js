@@ -26,13 +26,15 @@ export const CapsuleUpload = async (req, res) => {
 
 export const getCapsules = async (req, res) => {
   try {
-    const { page = 1, limit = 10 } = req.query;
-    const capsules = await Capsule.find()
+    const { page = 1, limit = 10, search = "" } = req.query;
+    const query = search ? { CapsuleName: { $regex: search, $options: "i" } } : {};
+
+    const capsules = await Capsule.find(query)
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(limit);
-    
-    const totalCapsules = await Capsule.countDocuments();
+
+    const totalCapsules = await Capsule.countDocuments(query);
 
     res.status(200).json({
       success: true,
