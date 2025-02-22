@@ -25,12 +25,12 @@ export const CapsuleUpload = async (req, res) => {
 export const getCapsules = async (req, res) => {
   try {
     const { page = 1, limit = 10 } = req.query;
-    const capsules = await Capsule.find({ viewRights: "public" })
+    const capsules = await Capsule.find()
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(limit);
     
-    const totalCapsules = await Capsule.countDocuments({ viewRights: "public" });
+    const totalCapsules = await Capsule.countDocuments();
 
     res.status(200).json({
       success: true,
@@ -112,15 +112,18 @@ export const requestAccess = async (req, res) => {
         if (!capsule) return res.status(404).json({ success: false, message: "Capsule not found" });
     
         if (capsule.viewRights === "public") {
-        return res.status(400).json({ success: false, message: "This capsule is already public" });
+            return res.status(400).json({ success: false, message: "This capsule is already public" });
         }
-    
+        if(capsule.viewRights === "onlyMe"){
+            return res.status(400).json({ success: false, message: "This capsule is private" });
+        }
+
         if (capsule.Admin.toString() === req.userId) {
-        return res.status(400).json({ success: false, message: "You are the admin of this capsule" });
+            return res.status(400).json({ success: false, message: "You are the admin of this capsule. Head to dashboard to manage this capsule." });
         }
     
         if (capsule.requests.includes(req.userId)) {
-        return res.status(400).json({ success: false, message: "Request already sent" });
+            return res.status(400).json({ success: false, message: "Request already sent" });
         }
     
         capsule.requests.push(req.userId);
