@@ -7,9 +7,9 @@ const Footer = () => {
         <div className="flex flex-col md:flex-row justify-between items-center">
           {/* Logo and Description */}
           <div className="mb-6 md:mb-0">
-            <h1 className="text-2xl font-bold">DigiMess</h1>
+            <h1 className="text-2xl font-bold">TimeCapsule</h1>
             <p className="mt-2 text-sm">
-              Simplifying mess management for students and staff.
+            Leave messages, share memories, and surprise your future self or loved ones.
             </p>
           </div>
 
@@ -56,7 +56,7 @@ const Footer = () => {
 
         {/* Copyright */}
         <div className="text-center text-sm">
-          &copy; {new Date().getFullYear()} MessEase. All rights reserved.
+          &copy; {new Date().getFullYear()} TimeCapsule. All rights reserved.
         </div>
       </div>
     </footer>
