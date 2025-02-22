@@ -22,7 +22,9 @@ function Sidebar({ isOpen, toggleSidebar }) {
         <button className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-700">
           <Link to="profile"><User size={20} /> {isOpen && "Profile"}</Link>
         </button>
-       
+        <button>
+          <Link to="create-capsule"><Utensils size={20} /> {isOpen && "Create Capsule"}</Link>
+        </button>
         <button className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-700">
           <Settings size={20} /> {isOpen && "Settings"}
         </button>
