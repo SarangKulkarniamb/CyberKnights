@@ -14,10 +14,7 @@ const PostSchema = new mongoose.Schema(
             type: String,
             required: true,
         },
-        CapsuleName: {
-            type: String,
-            required: true,
-        },
+        
        UserId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
