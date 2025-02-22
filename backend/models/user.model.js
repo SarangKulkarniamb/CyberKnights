@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 
+// User Schema
 const userSchema = new mongoose.Schema(
     {
         username: {
@@ -35,10 +36,15 @@ const userSchema = new mongoose.Schema(
         verificationTokenExpiresAt: {
             type: Date,
         },
+        profileId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Capsule",
+        },
     },
     { timestamps: true } 
 );
 
+// Optional index for token expiration (if using TTL on verificationTokenExpiresAt)
 userSchema.index({ verificationTokenExpiresAt: 1 }, { expireAfterSeconds: 0 });
 
 export const User = mongoose.model("User", userSchema);
