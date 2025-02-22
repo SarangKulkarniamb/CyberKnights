@@ -60,15 +60,22 @@ export const CapsuleDetails = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto p-6">
+    <div className="max-w-4xl mx-auto p-6 bg-gray-100 min-h-screen flex flex-col items-center">
       <Toaster />
-      <h2 className="text-4xl font-bold text-blue-700 text-center mb-12">
+      <h2 className="text-4xl font-bold text-blue-700 text-center mb-8">
         {capsule.CapsuleName}
       </h2>
-      <div className="bg-white shadow rounded-lg overflow-hidden">
+      <div className="bg-white shadow-lg rounded-lg overflow-hidden w-full max-w-3xl">
         <img
           src={capsule.banner}
           alt={capsule.CapsuleName}
+
+          className="w-full h-64 object-cover transition-transform duration-300 hover:scale-105"
+          onError={(e) => (e.target.src = "https://via.placeholder.com/800x300")}
+        />
+        <div className="p-6 space-y-4">
+          <p className="text-gray-700 text-lg leading-relaxed">{capsule.Description}</p>
+
           className="w-full h-64 object-cover"
         />
         <div className="p-6">
@@ -86,16 +93,18 @@ export const CapsuleDetails = () => {
             </button>
           )}
 
+
           {/* Author Section */}
           {author_profile && (
             <div className="mt-6 flex items-center space-x-4 border-t pt-4">
               <img
                 src={author_profile.profilePic}
                 alt={author_profile.name}
-                className="w-12 h-12 rounded-full object-cover"
+                className="w-14 h-14 rounded-full object-cover shadow-md border-2 border-blue-500"
               />
               <div className="flex flex-col">
-                <p className="text-lg font-semibold">{author_profile.displayName}</p>
+                <p className="text-lg font-semibold text-blue-700">{author_profile.displayName}</p>
+                <p className="text-gray-500 text-sm">Capsule Creator</p>
               </div>
             </div>
           )}

@@ -7,7 +7,6 @@ import { Link } from "react-router-dom";
 export const ExploreCapsules = () => {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
 
-  // Update online status
   useEffect(() => {
     const updateOnlineStatus = () => setIsOnline(navigator.onLine);
     window.addEventListener("online", updateOnlineStatus);
@@ -18,27 +17,26 @@ export const ExploreCapsules = () => {
     };
   }, []);
 
-  // Fetch function
   const fetchCapsules = async ({ pageParam = 1 }) => {
-    if (!isOnline) {
-      toast.error("You're offline. Check your internet connection.");
-      return { capsules: [], hasMore: false };
-    }
-
+    console.log("Fetching capsules from:", `${import.meta.env.VITE_CAPSULE_API_URL}/getCapsules?page=${pageParam}`);
     try {
       const { data } = await axios.get(
         `${import.meta.env.VITE_CAPSULE_API_URL}/getCapsules?page=${pageParam}`,
         { withCredentials: true }
       );
+      console.log("Fetched capsules:", data);
+      if (!data || !data.capsules) {
+        toast.error("No capsules found");
+        return { capsules: [], hasMore: false };
+      }
       return { ...data, hasMore: data.capsules.length > 0 };
     } catch (error) {
-      console.error("Error fetching capsules:", error);
-      toast.error("Failed to fetch capsules");
+      console.error("Error fetching capsules:", error.response?.data || error.message);
+      toast.error(`Failed to fetch capsules: ${error.response?.data?.message || "Unknown error"}`);
       return { capsules: [], hasMore: false };
     }
   };
 
-  // React Query: Infinite Scroll
   const {
     data,
     fetchNextPage,
@@ -50,10 +48,9 @@ export const ExploreCapsules = () => {
     queryFn: fetchCapsules,
     getNextPageParam: (lastPage, pages) =>
       lastPage.hasMore ? pages.length + 1 : undefined,
-    retry: false, // Disable automatic retries
+    retry: false,
   });
 
-  // Intersection Observer
   const observer = useRef(null);
   const lastCapsuleRef = useCallback(
     (node) => {
@@ -64,7 +61,7 @@ export const ExploreCapsules = () => {
         (entries) => {
           if (entries[0].isIntersecting) fetchNextPage();
         },
-        { threshold: 1.0 } // Trigger only when the entire element is visible
+        { threshold: 1.0 }
       );
 
       if (node) observer.current.observe(node);
@@ -72,14 +69,12 @@ export const ExploreCapsules = () => {
     [isFetchingNextPage, hasNextPage, fetchNextPage, isOnline]
   );
 
-  // Cleanup observer on unmount
   useEffect(() => {
     return () => {
       if (observer.current) observer.current.disconnect();
     };
   }, []);
 
-  // Loading and error states
   if (status === "loading") return <p className="text-center mt-4">Loading...</p>;
   if (status === "error") return <p className="text-center mt-4">Failed to load capsules.</p>;
 
@@ -89,7 +84,7 @@ export const ExploreCapsules = () => {
       <h2 className="text-4xl font-bold text-blue-700 text-center mb-12">
         Public Time Capsules
       </h2>
-      <div className="space-y-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {data?.pages?.map((page, pageIndex) =>
           page.capsules.map((capsule, index) => {
             const isLastItem =
@@ -99,26 +94,18 @@ export const ExploreCapsules = () => {
               <div
                 key={capsule._id}
                 ref={isLastItem ? lastCapsuleRef : null}
-                className="bg-white shadow rounded-lg overflow-hidden"
+                className="bg-white shadow-lg rounded-lg overflow-hidden transform transition duration-300 hover:scale-105 hover:shadow-2xl p-6"
               >
-                <img
-                  src={capsule.banner}
-                  alt={capsule.CapsuleName}
-                  className="w-full h-48 object-cover"
-                  onError={(e) => {
-                    e.target.onerror = null; // Prevent infinite loop
-                    e.target.src = "https://dummyimage.com/800x300/ccc/000.png&text=No+Image"; // Fallback image
-                  }}
-                />
-                <div className="p-6">
                 <Link to={`/dashboard/capsule/${capsule._id}`}>
-                    <h3 className="text-2xl font-semibold text-blue-700 mb-2 hover:underline">
-                        {capsule.CapsuleName}
-                    </h3>
+                  <h3 className="text-2xl font-semibold text-blue-700 mb-2 hover:underline transition duration-300 hover:text-blue-500">
+                    {capsule.CapsuleName}
+                  </h3>
                 </Link>
+
                   <p className="text-gray-600">{capsule.Description}</p>
                   <p className="text-gray-600" > {capsule.viewRights}</p>
                 </div>
+
               </div>
             );
           })
