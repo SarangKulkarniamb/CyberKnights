@@ -74,11 +74,8 @@ export const CapsuleDetails = () => {
           onError={(e) => (e.target.src = "https://via.placeholder.com/800x300")}
         />
         <div className="p-6 space-y-4">
-          <p className="text-gray-700 text-lg leading-relaxed">{capsule.Description}</p>
-
-          className="w-full h-64 object-cover"
-        />
-        <div className="p-6">
+          
+        
           <p className="text-gray-600 text-lg">{capsule.Description}</p>
           <p className="text-gray-600 text-lg">View Rights: {capsule.viewRights}</p>
 
