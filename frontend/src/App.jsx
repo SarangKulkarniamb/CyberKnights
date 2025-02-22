@@ -13,6 +13,7 @@ import Logout from './components/helper/Logout'
 import {CreateTimeCapsule} from './components/Dashboard/CreateTimeCapsule'
 import {ProfileView} from './components/Dashboard/ProfileView'
 import { ExploreCapsules } from './components/Dashboard/exploreCapsules'
+import { CapsuleDetails } from './components/Dashboard/CapsuleDetails'
 // Protected route component
 const Protected = ({ children, isPublic = false }) => {
   const auth = useRecoilValue(authState);
@@ -48,6 +49,7 @@ const App = () => {
           <Route path="profile" element={<ProfileView />} />
           <Route path="create-capsule" element={<CreateTimeCapsule/>} />
           <Route path="explore-capsules" element={<ExploreCapsules/>} />
+          <Route path="capsule/:id" element={<CapsuleDetails />} />
         </Route>
         
         <Route path="/logout" element={<Protected><Logout /></Protected>} />
