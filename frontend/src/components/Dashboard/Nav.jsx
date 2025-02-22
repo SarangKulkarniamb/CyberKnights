@@ -1,7 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-
+import {useSetRecoilState , useRecoilValue} from 'recoil'
+import { profileState } from '../../atoms/profileAtom'
 export function Nav() {
+
+  const setProfileState = useSetRecoilState(profileState)
+ 
   const { data: profile, isLoading, error } = useQuery({
     queryKey: ["profile"],
     queryFn: async () => {
@@ -9,9 +13,12 @@ export function Nav() {
         `${import.meta.env.VITE_PROFILE_API_URL}/me`,
         { withCredentials: true }
       );
+      setProfileState(response.data.profile)
+      console.log("Fetched profile:", response.data.profile);
       return response.data.profile;
     },
   });
+ 
 
   return (
     <>
@@ -37,13 +44,6 @@ export function Nav() {
           )}
         </div>
       </div>
-
-      {/* Profile Warning Banner (Only shown if profile is missing) */}
-      {!isLoading && !error && !profile && (
-        <div className="w-full bg-yellow-500 text-black text-center py-2 font-semibold">
-          <p>You haven't set up your profile yet. Please add your profile information.</p>
-        </div>
-      )}
     </>
   );
 }

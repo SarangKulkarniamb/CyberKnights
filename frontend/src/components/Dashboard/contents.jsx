@@ -6,10 +6,11 @@ const DashboardGrid = () => {
     { name: "Add Capsule", icon: <FaPlusCircle />, link: "create-capsule" },
     { name: "Explore Capsules", icon: <FaSearch />, link: "explore-capsules" },
   ];
-
+  
   return (
     <div className="p-6">
       <div className="grid grid-cols-2 gap-6">
+
         {options.map((option, index) => (
           <Link
             to={option.link}

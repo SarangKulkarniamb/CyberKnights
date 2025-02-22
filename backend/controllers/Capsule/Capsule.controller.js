@@ -1,7 +1,6 @@
 import { Capsule } from "../../models/Capsule.model.js";
 import { Profile } from "../../models/profile.model.js";
 
-
 export const CapsuleUpload = async (req, res) => {
   try {
     const { Description, CapsuleName, viewRights } = req.body;
@@ -26,7 +25,7 @@ export const CapsuleUpload = async (req, res) => {
 
 export const getCapsules = async (req, res) => {
   try {
-    const { page = 1, limit = 10, search = "" } = req.query;
+    const { page = 1, limit = 5, search = "" } = req.query;
     const query = search ? { CapsuleName: { $regex: search, $options: "i" } } : {};
 
     const capsules = await Capsule.find(query)
