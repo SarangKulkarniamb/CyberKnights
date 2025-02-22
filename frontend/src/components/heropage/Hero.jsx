@@ -35,7 +35,7 @@ const Hero = () => {
                             },
                             }}
                     >
-                        Streamline Your Campus Dining Experience
+                        Preserve Today, Relive Tomorrow
                     </motion.h1>
                     <motion.p
                         className="text-lg lg:text-xl text-center text-gray-700 mt-4"
@@ -51,7 +51,7 @@ const Hero = () => {
                             },
                             }}
                     >
-                        Quick payments, easy scans, and hassle-free meals...
+                        Create your own digital time capsule and share it with the future.
                     </motion.p>
                 </motion.div>
 

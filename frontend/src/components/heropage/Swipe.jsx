@@ -5,6 +5,9 @@ import "slick-carousel/slick/slick-theme.css";
 import { IoMdArrowDropleftCircle, IoMdArrowDroprightCircle } from "react-icons/io";
 import { motion } from "framer-motion";
 import heroImage from "../../assets/heroimage.png";
+import Image1 from "../../assets/image1.png";
+import Image2 from "../../assets/image2.png";
+import Image3 from "../../assets/image3.png";
 const SwipeSection = () => {
   const sliderRef = useRef(null);
 
@@ -46,33 +49,33 @@ const SwipeSection = () => {
             <div>
               <div className="flex flex-col md:flex-row justify-around gap-6 items-center text-center text-black p-8 rounded-xl">
                 <div className="flex flex-col gap-4"> 
-                    <h3 className="text-xl md:text-2xl lg:text-3xl text-blue-950 font-semibold">QR Payments</h3>
-                    <p className="mt-4 text-md md:text-lg lg:text-xl">Fast and secure transactions with QR codes.</p>
+                    <h3 className="text-xl md:text-2xl lg:text-3xl text-blue-950 font-semibold">Capture Today,Unlock Tomorrow</h3>
+                    <p className="mt-4 text-md md:text-lg lg:text-xl">Preserve your memories and relive them when the time is right</p>
                 </div>
                 
-                <img src={heroImage} className="w-48 h-48" alt="" />
+                <img src={Image1} className="w-48 h-48" alt="" />
               </div>
             </div>
            
             <div>
               <div className="flex flex-col md:flex-row justify-around items-center text-center text-black p-8 rounded-xl">
                 <div className="flex flex-col gap-4">
-                    <h3 className="text-xl md:text-2xl lg:text-3xl text-blue-950 font-semibold">Account Recharge</h3>
-                    <p className="mt-4 text-md md:text-lg lg:text-xl">Easily top up your account anytime.</p>
+                    <h3 className="text-xl md:text-2xl lg:text-3xl text-blue-950 font-semibold">Add Time Capsules</h3>
+                    <p className="mt-4 text-md md:text-lg lg:text-xl">Create a digital time capsule and ensure your stories are never forgotten.</p>
                 </div>
                 
-                <img src={heroImage} className="w-48 h-48" alt="" />
+                <img src={Image2} className="w-48 h-48" alt="" />
               </div>
             </div>
        
             <div>
               <div className="flex flex-col md:flex-row gap-6 justify-around items-center text-center text-black p-8 rounded-xl">
                 <div className="flex flex-col gap-4">
-                    <h3 className="text-xl md:text-2xl lg:text-3xl text-blue-950 font-semibold">Transaction History</h3>
-                    <p className="mt-4 text-md md:text-lg lg:text-xl">View your past payments and logs.</p>
+                    <h3 className="text-xl md:text-2xl lg:text-3xl text-blue-950 font-semibold">Preserve memories together,Share the journey</h3>
+                    <p className="mt-4 text-md md:text-lg lg:text-xl">Collaborate with friends, family, or a community</p>
                 </div>
                 
-                <img src={heroImage} className="w-48 h-48" alt="" />
+                <img src={Image3} className="w-48 h-48" alt="" />
               </div>
             </div>
 

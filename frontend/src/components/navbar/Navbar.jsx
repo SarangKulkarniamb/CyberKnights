@@ -12,7 +12,7 @@ const Navbar = () => {
     setOpen(!open);
   }
 
-  let rotate = open ? 180 : 0; 
+  let rotate = open ? 180 : 0;
 
   return (
     <>
@@ -21,8 +21,12 @@ const Navbar = () => {
           {/* Logo */}
           <Link to="/">
             <div className="text-2xl flex gap-2 items-center">
-              <IoRestaurantSharp />
-              <p className="font-medium tracking-tighter">DigiMess</p>
+              <img
+                src="https://images.squarespace-cdn.com/content/v1/5566b5f4e4b01b9595a5f165/1433474027138-T9FRBKEZ51IYKIKSA5L1/Time-Capsule-Logo-Final.jpg?format=1000w"
+                alt="TimeCapsule Logo"
+                className="h-12 w-auto" // Adjust size as needed
+              />
+              <p className="font-medium tracking-tighter">TimeCapsule</p>
             </div>
           </Link>
 
