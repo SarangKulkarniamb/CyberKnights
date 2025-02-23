@@ -87,7 +87,7 @@ export const updateCapsule = async (req, res) => {
     if (!updatedCapsule) {
       return res.status(404).json({ message: "Capsule not found" });
     }
-    res.json(updatedCapsule);
+    res.status(200).json({ success: true, capsule: updatedCapsule });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -100,30 +100,67 @@ export const deleteCapsule = async (req, res) => {
     if (!deletedCapsule) {
       return res.status(404).json({ message: "Capsule not found" });
     }
-    res.json({ message: "Capsule deleted successfully" });
+    res.status(200).json({ success: true, message: "Capsule deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-export const getMyCapsules = async (req, res) => {
+export const grantAccess = async (req, res) => {
   try {
-    const capsules = await Capsule.find({ Admin: req.userId });
-    res.status(200).json({ success: true, capsules });
+    const { id } = req.params; // capsule id
+    const { username } = req.body;
+
+    // Find user by username
+    const user = await User.findOne({ username });
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    const capsule = await Capsule.findById(id);
+    if (!capsule) {
+      return res.status(404).json({ success: false, message: "Capsule not found" });
+    }
+    // Check if current user is admin of the capsule
+    if (capsule.Admin.toString() !== req.userId) {
+      return res.status(403).json({ success: false, message: "Unauthorized" });
+    }
+
+    // Grant access: add the user's _id if not already present
+    if (!capsule.access.includes(user._id)) {
+      capsule.access.push(user._id);
+      await capsule.save();
+    }
+
+    res.status(200).json({ success: true, message: "Access granted successfully", capsule });
   } catch (error) {
-    console.error("Error fetching capsules:", error);
-    res.status(500).json({ success: false, message: "Failed to fetch capsules" });
+    console.error("Error granting access:", error);
+    res.status(500).json({ success: false, message: "Failed to grant access" });
   }
 };
 
-export const searchCapsules = async (req, res) => {
+export const getAdminCapsules = async (req, res) => {
   try {
-    const { query } = req.query;
-    const capsules = await Capsule.find({ CapsuleName: { $regex: query, $options: "i" } });
-    res.status(200).json({ success: true, capsules });
+    const { page = 1, limit = 5, search = "" } = req.query;
+    const pageNum = parseInt(page, 10);
+    const limitNum = parseInt(limit, 10);
+
+    const query = { Admin: req.userId };
+    if (search) {
+      query.CapsuleName = { $regex: search, $options: "i" };
+    }
+
+    const capsules = await Capsule.find(query)
+      .sort({ createdAt: -1 })
+      .skip((pageNum - 1) * limitNum)
+      .limit(limitNum);
+    const total = await Capsule.countDocuments(query);
+    const hasMore = pageNum * limitNum < total;
+
+    res.status(200).json({ success: true, capsules, hasMore });
   } catch (error) {
-    console.error("Error searching capsules:", error);
-    res.status(500).json({ success: false, message: "Failed to search capsules" });
+    console.error("Error fetching admin capsules:", error);
+    res.status(500).json({ success: false, message: "Failed to fetch capsules" });
   }
 };
 
@@ -154,27 +191,55 @@ export const requestAccess = async (req, res) => {
         console.error("Error requesting access:", error);
         res.status(500).json({ success: false, message: "Failed to request access" });
     }
+  }
+
+   
+
+    export const revokeAccess = async (req, res) => {
+
+    try {
+
+    }
+    catch (error) {}}
+
+
+
+export const unlockCapsule = async (req, res) => {
+  try {
+    const capsule = await Capsule.findById(req.params.id);
+    if (!capsule) {
+      return res.status(404).json({ success: false, message: "Capsule not found" });
     }
 
-    export const grantAccess = async (req, res) => {
-    try {
-        const capsule = await Capsule.findById(req.params.id);
-        if (!capsule) return res.status(404).json({ success: false, message: "Capsule not found" });
-    
-        if (capsule.Admin.toString() !== req.userId) {
-        return res.status(401).json({ success: false, message: "Unauthorized" });
-        }
-    
-        if (!capsule.requests.includes(req.body.userId)) {
-        return res.status(400).json({ success: false, message: "No request found" });
-        }
-    
-        capsule.requests = capsule.requests.filter((id) => id.toString() !== req.body.userId);
-        capsule.access.push(req.body.userId);
-        await capsule.save();
-        res.status(200).json({ success: true, message: "Access granted" });
-    } catch (error) {
-        console.error("Error granting access:", error);
-        res.status(500).json({ success: false, message: "Failed to grant access" });
+   
+    if (!capsule.lockedUntil) {
+      return res.status(400).json({ success: false, message: "No lockedUntil date set" });
     }
+
+    const now = new Date();
+    const lockedUntil = new Date(capsule.lockedUntil);
+
+
+    if (now < lockedUntil) {
+      return res.status(400).json({
+        success: false,
+        message: "Countdown is not over yet",
+      });
     }
+
+    capsule.locked = false;
+    await capsule.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Capsule unlocked successfully",
+      capsule,
+    });
+  } catch (error) {
+    console.error("Error unlocking capsule:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to unlock capsule",
+    });
+  }
+};

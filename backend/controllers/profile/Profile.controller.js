@@ -70,3 +70,4 @@ export const GetProfile = async function (req, res) {
         res.status(500).json({ success: false, message: "Failed to get profile" })
     }
 }
+

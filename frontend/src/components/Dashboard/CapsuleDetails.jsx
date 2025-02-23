@@ -37,10 +37,16 @@ export const CapsuleDetails = () => {
   // Adjust for data shape: use data.capsule if available, else data directly
   const capsule = data?.capsule || data;
 
-  // canPost logic – user can post if:
-  // 1. Capsule is public OR
-  // 2. User is the admin OR
-  // 3. Capsule viewRights is "specificPeople" and user is in capsule.access.
+  // Compute whether countdown is over
+  const isCountdownOver =
+    capsule && capsule.lockedUntil
+      ? new Date() >= new Date(capsule.lockedUntil)
+      : false;
+
+  // effectiveLocked: capsule is locked unless countdown is over
+  const effectiveLocked = capsule && capsule.locked && !isCountdownOver;
+
+  // canPost logic
   const canPost =
     capsule &&
     (capsule.viewRights === "public" ||
@@ -48,13 +54,7 @@ export const CapsuleDetails = () => {
       (capsule.viewRights === "specificPeople" &&
         capsule.access?.includes(userId)));
 
-  // Determine if user has already requested access
   const alreadyRequested = capsule?.requests?.includes(userId);
-  // User can request access if:
-  // - Capsule viewRights is "specificPeople"
-  // - User is not admin
-  // - User does not have access (i.e. not in capsule.access)
-  // - User has not already requested access
   const canRequestAccess =
     capsule &&
     capsule.viewRights === "specificPeople" &&
@@ -62,7 +62,7 @@ export const CapsuleDetails = () => {
     !capsule.access?.includes(userId) &&
     !alreadyRequested;
 
-  // Infinite Query for posts (filtering by capsuleId)
+  // Infinite Query for posts
   const {
     data: postsData,
     isLoading: postsLoading,
@@ -85,7 +85,7 @@ export const CapsuleDetails = () => {
     },
     getNextPageParam: (lastPage, pages) =>
       lastPage.hasMore ? pages.length + 1 : undefined,
-    enabled: !!capsule, // only run when capsule is available
+    enabled: !!capsule,
   });
 
   // Mutation for creating a post
@@ -105,7 +105,7 @@ export const CapsuleDetails = () => {
       toast.success("Post created successfully!");
       setPostContent({ title: "", content: "", media: null });
       setIsPosting(false);
-      refetchPosts(); // Refresh posts after creation
+      refetchPosts();
     },
     onError: (error) => {
       toast.error(error.response?.data?.message || "Failed to create post.");
@@ -141,7 +141,7 @@ export const CapsuleDetails = () => {
     },
     onSuccess: (data) => {
       toast.success(data.message || "Request sent");
-      refetch(); // Refresh capsule details to update requests
+      refetch();
     },
     onError: (error) => {
       setIsPosting(false);
@@ -153,6 +153,32 @@ export const CapsuleDetails = () => {
 
   const handleRequestAccess = () => {
     requestAccessMutation.mutate();
+  };
+
+  // Mutation for unlocking the capsule (calls the backend endpoint)
+  const unlockMutation = useMutation({
+    mutationFn: async () => {
+      const response = await axios.post(
+        `${import.meta.env.VITE_CAPSULE_API_URL}/${id}/unlock`,
+        {},
+        { withCredentials: true }
+      );
+      return response.data;
+    },
+    onSuccess: (data) => {
+      toast.success(data.message || "Capsule unlocked!");
+      refetch(); // Refresh capsule details so posts become visible
+    },
+    onError: (error) => {
+      toast.error(
+        error.response?.data?.message || "Failed to unlock capsule"
+      );
+    },
+  });
+
+  // onCountdownComplete callback: call the unlock endpoint
+  const handleCountdownComplete = () => {
+    unlockMutation.mutate();
   };
 
   if (isLoading) return <p className="text-center mt-4">Loading...</p>;
@@ -178,7 +204,6 @@ export const CapsuleDetails = () => {
           />
           <div className="p-6 space-y-4">
             <p className="text-gray-600 text-lg">{capsule.Description}</p>
-            {/* Display user's name and profile picture */}
             <div className="flex items-center space-x-2">
               <img
                 src={userProfile.profile.profilePic}
@@ -189,13 +214,11 @@ export const CapsuleDetails = () => {
                 {userProfile.profile.displayName}
               </p>
             </div>
-            {/* Indicator for locked capsule */}
             {capsule.locked && (
               <div className="bg-yellow-100 p-4 rounded-lg text-yellow-800">
                 <p>This capsule is locked.</p>
               </div>
             )}
-            {/* Indicator for access restrictions */}
             {capsule.viewRights === "specificPeople" && !canPost && (
               <div className="bg-red-100 p-4 rounded-lg text-red-800">
                 <p>
@@ -246,7 +269,6 @@ export const CapsuleDetails = () => {
             </form>
           </div>
         ) : (
-          // If user cannot post but can request access, display button.
           capsule.viewRights === "specificPeople" &&
           canRequestAccess && (
             <div className="bg-white shadow-lg rounded-lg p-6 w-1/3 flex flex-col items-center justify-center">
@@ -264,8 +286,8 @@ export const CapsuleDetails = () => {
         )}
       </div>
 
-      {/* Display posts only if capsule is not locked and user has access */}
-      {!capsule.locked && canPost ? (
+      {/* Display posts if capsule is unlocked (or countdown is over) and user has access */}
+      {(!capsule.locked || isCountdownOver) && canPost ? (
         <div className="mt-8 w-5/6 bg-white shadow-lg rounded-lg p-6">
           <h3 className="text-2xl font-bold text-blue-700 mb-4">User Posts</h3>
           {postsLoading ? (
@@ -305,13 +327,15 @@ export const CapsuleDetails = () => {
           )}
         </div>
       ) : (
-        // Display a message if the capsule is locked or user doesn't have access
+        // If capsule is locked and countdown not over, show countdown.
         <div className="mt-8 w-5/6 bg-white shadow-lg rounded-lg p-6">
-          <p className="text-gray-500">
-            {capsule.locked
-              ? <CountDown time={capsule.lockedUntil}/>
-              : "You do not have access to view posts in this capsule."}
-          </p>
+          {capsule.locked && !isCountdownOver ? (
+            <CountDown time={capsule.lockedUntil} onComplete={handleCountdownComplete} />
+          ) : (
+            <p className="text-gray-500">
+              You do not have access to view posts in this capsule.
+            </p>
+          )}
         </div>
       )}
     </div>

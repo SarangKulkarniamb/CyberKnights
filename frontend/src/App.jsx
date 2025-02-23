@@ -17,6 +17,7 @@ import { authState } from './atoms/authAtom';
 import { profileState } from './atoms/profileAtom';
 import axios from 'axios';
 import { useQuery } from '@tanstack/react-query';
+import CapsuleManage from './components/Dashboard/CapsulesManage';
 
 
 const Protected = ({ children, isPublic = false }) => {
@@ -81,6 +82,7 @@ const App = () => {
             <Route path="create-capsule" element={<CreateTimeCapsule />} />
             <Route path="explore-capsules" element={<ExploreCapsules />} />
             <Route path="capsule/:id" element={<CapsuleDetails />} />
+            <Route path="manage-capsules" element={ <CapsuleManage/> } />
           </Route>
         </Route>
 

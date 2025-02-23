@@ -1,39 +1,40 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 
-export const CountDown = ({ time }) => {
+export const CountDown = ({ time, onComplete }) => {
+  // Calculate remaining time as an object or null if time is up.
   const calculateTimeLeft = () => {
     const difference = new Date(time) - new Date();
-    if (difference > 0) {
-      return {
-        days: Math.floor(difference / (1000 * 60 * 60 * 24)),
-        hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
-        minutes: Math.floor((difference / (1000 * 60)) % 60),
-        seconds: Math.floor((difference / 1000) % 60),
-      };
-    }
-    return null;
+    if (difference <= 0) return null;
+    return {
+      days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+      hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
+      minutes: Math.floor((difference / (1000 * 60)) % 60),
+      seconds: Math.floor((difference / 1000) % 60),
+    };
   };
 
   const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setTimeLeft(calculateTimeLeft());
+      const newTimeLeft = calculateTimeLeft();
+      setTimeLeft(newTimeLeft);
+      if (!newTimeLeft) {
+        clearInterval(timer);
+        onComplete && onComplete();
+      }
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [time]);
+  }, [time, onComplete]);
+
+  if (!timeLeft) {
+    return <div>Unlocked!</div>;
+  }
 
   return (
-    <div className="text-center text-xl font-bold">
-      <p className="text-gray-600 mb-2">Countdown to the big reveal:</p>
-      {timeLeft ? (
-        <p>
-          {timeLeft.days}d {timeLeft.hours}h {timeLeft.minutes}m {timeLeft.seconds}s
-        </p>
-      ) : (
-        <p>Time has arrived!</p>
-      )}
+    <div className="text-xl font-bold">
+      {timeLeft.days}d {timeLeft.hours}h {timeLeft.minutes}m {timeLeft.seconds}s
     </div>
   );
 };
