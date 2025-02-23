@@ -168,9 +168,9 @@ export const CreateTimeCapsule = () => {
             onChange={handleChange}
             className="w-full px-4 py-2 border rounded-lg focus:ring-blue-500"
           >
-            <option value="public">Public</option>
-            <option value="onlyMe">Only Me</option>
-            <option value="specificPeople">Specific People</option>
+            <option value="public">Anyone can see and post in your capsule.</option>
+            <option value="onlyMe">You can grant access to users.</option>
+            <option value="specificPeople">Users can ask for access</option>
           </select>
         </div>
 
