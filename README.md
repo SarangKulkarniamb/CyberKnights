@@ -58,13 +58,13 @@ PROJECT INITIALISATION INSTRUCTIONS:
 
 In Root directory :  
     
-            npm install --legacy-peer-deps
+    npm install --legacy-peer-deps
             
  In frontend directory :
  
-     run "npm install"
+    npm install
 
  In root directory to run the code : 
          
-            npm run start
+    npm run start
 
