@@ -7,7 +7,7 @@ import { motion } from 'framer-motion'
 function Homepage() {
 
   return (
-    <div className="min-h-screen overflow-x-hidden bg-white-50">
+    <div className="min-h-screen overflow-x-hidden bg-gray-50">
       <motion.div
         variants={{
           hidden: { opacity: 1 },

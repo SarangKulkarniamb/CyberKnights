@@ -13,9 +13,9 @@ const router = express.Router()
 
 router.post('/Capsule-upload',authMiddleware, upload.single('banner'), CapsuleUpload)
 router.get('/getCapsules', authMiddleware,getCapsules)
+router.get("/admin", authMiddleware, getAdminCapsules);
 router.get('/:id', authMiddleware, getCapsule)
 router.post('/:id/request-access', authMiddleware, requestAccess)
-router.get("/admin", authMiddleware, getAdminCapsules);
 router.put("/:id", authMiddleware, updateCapsule);
 router.delete("/:id", authMiddleware, deleteCapsule);
 router.post("/:id/grant-access", authMiddleware, grantAccess);
