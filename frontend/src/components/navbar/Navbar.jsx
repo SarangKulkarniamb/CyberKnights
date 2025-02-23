@@ -26,7 +26,7 @@ const Navbar = () => {
                 alt="TimeCapsule Logo"
                 className="h-12 w-auto" // Adjust size as needed
               />
-              <p className="font-medium tracking-tighter">TimeVault</p>
+              <p className="font-medium tracking-tighter">Time Capsule</p>
             </div>
           </Link>
 
