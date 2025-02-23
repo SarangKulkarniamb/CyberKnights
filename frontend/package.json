@@ -4,10 +4,11 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
+  "dev": "npx vite",
+  "build": "npx vite build",
+  "preview": "npx vite preview",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+
   },
   "dependencies": {
     "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
