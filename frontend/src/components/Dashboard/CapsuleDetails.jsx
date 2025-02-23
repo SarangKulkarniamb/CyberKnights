@@ -2,9 +2,11 @@ import { useParams } from "react-router-dom";
 import { useQuery, useInfiniteQuery, useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRecoilValue } from "recoil";
 import { authState } from "../../atoms/authAtom";
+import { CountDown } from "./CountDown";
+import { profileState } from "../../atoms/profileAtom";
 
 export const CapsuleDetails = () => {
   const { id } = useParams();
@@ -16,6 +18,7 @@ export const CapsuleDetails = () => {
   });
   const auth = useRecoilValue(authState);
   const userId = auth.user._id;
+  const userProfile = useRecoilValue(profileState);
 
   // Fetch capsule details
   const fetchCapsuleDetails = async () => {
@@ -120,7 +123,6 @@ export const CapsuleDetails = () => {
       formData.append("media", postContent.media);
     }
     postMutation.mutate(formData);
-   
   };
 
   const handleFileChange = (e) => {
@@ -176,6 +178,31 @@ export const CapsuleDetails = () => {
           />
           <div className="p-6 space-y-4">
             <p className="text-gray-600 text-lg">{capsule.Description}</p>
+            {/* Display user's name and profile picture */}
+            <div className="flex items-center space-x-2">
+              <img
+                src={userProfile.profile.profilePic}
+                alt={userProfile.profile.displayName}
+                className="w-8 h-8 rounded-full"
+              />
+              <p className="text-gray-700 font-medium">
+                {userProfile.profile.displayName}
+              </p>
+            </div>
+            {/* Indicator for locked capsule */}
+            {capsule.locked && (
+              <div className="bg-yellow-100 p-4 rounded-lg text-yellow-800">
+                <p>This capsule is locked.</p>
+              </div>
+            )}
+            {/* Indicator for access restrictions */}
+            {capsule.viewRights === "specificPeople" && !canPost && (
+              <div className="bg-red-100 p-4 rounded-lg text-red-800">
+                <p>
+                  This capsule is restricted. You need access to view or post.
+                </p>
+              </div>
+            )}
           </div>
         </div>
 
@@ -237,8 +264,8 @@ export const CapsuleDetails = () => {
         )}
       </div>
 
-      {/* Display posts only if capsule is not locked */}
-      {!capsule.locked && canPost && (
+      {/* Display posts only if capsule is not locked and user has access */}
+      {!capsule.locked && canPost ? (
         <div className="mt-8 w-5/6 bg-white shadow-lg rounded-lg p-6">
           <h3 className="text-2xl font-bold text-blue-700 mb-4">User Posts</h3>
           {postsLoading ? (
@@ -247,11 +274,12 @@ export const CapsuleDetails = () => {
             <p className="text-gray-500">Error loading posts.</p>
           ) : (
             <>
-              {postsData?.pages.flatMap((page) => page.posts).length === 0 ? (
+              {postsData?.pages.flatMap((page) => page.posts || []).length ===
+              0 ? (
                 <p className="text-gray-500">No posts yet.</p>
               ) : (
                 postsData.pages.flatMap((page) =>
-                  page.posts.map((post, index) => (
+                  (page.posts || []).map((post, index) => (
                     <div
                       key={post._id || index}
                       className="p-4 border-b last:border-b-0"
@@ -275,6 +303,15 @@ export const CapsuleDetails = () => {
               )}
             </>
           )}
+        </div>
+      ) : (
+        // Display a message if the capsule is locked or user doesn't have access
+        <div className="mt-8 w-5/6 bg-white shadow-lg rounded-lg p-6">
+          <p className="text-gray-500">
+            {capsule.locked
+              ? <CountDown time={capsule.lockedUntil}/>
+              : "You do not have access to view posts in this capsule."}
+          </p>
         </div>
       )}
     </div>
