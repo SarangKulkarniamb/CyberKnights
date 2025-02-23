@@ -2,15 +2,24 @@ import { useState } from "react";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
+import { useSetRecoilState } from "recoil";
+import { profileState } from "../../atoms/profileAtom"
+
+
 
 export const ProfileView = () => {
     const [isEditing, setIsEditing] = useState(false);
     const queryClient = useQueryClient();
 
+    const setProfileState = useSetRecoilState(profileState);
     const { data: profile, isLoading, error } = useQuery({
         queryKey: ["profile"],
         queryFn: async () => {
             const response = await axios.get(`${import.meta.env.VITE_PROFILE_API_URL}/me`, { withCredentials: true });
+            setProfileState({
+                isAvailable: true,
+                profile: response.data.profile,
+            })
             return response.data.profile;
         },
     });

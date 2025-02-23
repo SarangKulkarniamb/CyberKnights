@@ -2,9 +2,14 @@ import { useRecoilValue } from "recoil";
 import { authState } from "../../atoms/authAtom";
 import DashboardGrid from "./contents"; 
 import { profileState } from "../../atoms/profileAtom";
+import { useNavigate } from "react-router-dom";
 export function MainBody() {
-  const auth = useRecoilValue(authState);
+  const navigate = useNavigate();
   const userProfile = useRecoilValue(profileState);
+  if(userProfile.profile === null){
+    console.log("User Profile is null")
+    navigate("profile")
+  }
   console.log("User Profile:", userProfile.profile);
   return (
     <div className="p-6">

@@ -14,9 +14,8 @@ export const CapsuleDetails = () => {
     content: "",
     media: null,
   });
-
   const auth = useRecoilValue(authState);
-  const userId = auth.userId;
+  const userId = auth.user._id;
 
   // Fetch capsule details
   const fetchCapsuleDetails = async () => {
@@ -27,21 +26,40 @@ export const CapsuleDetails = () => {
     return data;
   };
 
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ["capsule", id],
     queryFn: fetchCapsuleDetails,
   });
 
-
+  // Adjust for data shape: use data.capsule if available, else data directly
   const capsule = data?.capsule || data;
 
+  // canPost logic – user can post if:
+  // 1. Capsule is public OR
+  // 2. User is the admin OR
+  // 3. Capsule viewRights is "specificPeople" and user is in capsule.access.
   const canPost =
     capsule &&
     (capsule.viewRights === "public" ||
       (capsule.Admin && capsule.Admin.toString() === userId) ||
-      (capsule.viewRights === "specificPeople" && capsule.access?.includes(userId)));
+      (capsule.viewRights === "specificPeople" &&
+        capsule.access?.includes(userId)));
 
-  
+  // Determine if user has already requested access
+  const alreadyRequested = capsule?.requests?.includes(userId);
+  // User can request access if:
+  // - Capsule viewRights is "specificPeople"
+  // - User is not admin
+  // - User does not have access (i.e. not in capsule.access)
+  // - User has not already requested access
+  const canRequestAccess =
+    capsule &&
+    capsule.viewRights === "specificPeople" &&
+    capsule.Admin.toString() !== userId &&
+    !capsule.access?.includes(userId) &&
+    !alreadyRequested;
+
+  // Infinite Query for posts (filtering by capsuleId)
   const {
     data: postsData,
     isLoading: postsLoading,
@@ -64,9 +82,10 @@ export const CapsuleDetails = () => {
     },
     getNextPageParam: (lastPage, pages) =>
       lastPage.hasMore ? pages.length + 1 : undefined,
-    enabled: !!capsule, 
+    enabled: !!capsule, // only run when capsule is available
   });
 
+  // Mutation for creating a post
   const postMutation = useMutation({
     mutationFn: async (formData) => {
       const response = await axios.post(
@@ -80,21 +99,19 @@ export const CapsuleDetails = () => {
       return response.data;
     },
     onSuccess: (newPost) => {
-      setIsPosting(false);
       toast.success("Post created successfully!");
       setPostContent({ title: "", content: "", media: null });
+      setIsPosting(false);
       refetchPosts(); // Refresh posts after creation
     },
     onError: (error) => {
-      setIsPosting(false);
       toast.error(error.response?.data?.message || "Failed to create post.");
     },
   });
 
-  const handlePostSubmit = async (e) => {
+  const handlePostSubmit = (e) => {
     e.preventDefault();
     setIsPosting(true);
-
     const formData = new FormData();
     formData.append("title", postContent.title);
     formData.append("content", postContent.content);
@@ -102,13 +119,38 @@ export const CapsuleDetails = () => {
     if (postContent.media) {
       formData.append("media", postContent.media);
     }
-
     postMutation.mutate(formData);
-
+   
   };
 
   const handleFileChange = (e) => {
     setPostContent({ ...postContent, media: e.target.files[0] });
+  };
+
+  // Mutation for requesting access
+  const requestAccessMutation = useMutation({
+    mutationFn: async () => {
+      const response = await axios.post(
+        `${import.meta.env.VITE_CAPSULE_API_URL}/${id}/request-access/`,
+        {},
+        { withCredentials: true }
+      );
+      return response.data;
+    },
+    onSuccess: (data) => {
+      toast.success(data.message || "Request sent");
+      refetch(); // Refresh capsule details to update requests
+    },
+    onError: (error) => {
+      setIsPosting(false);
+      toast.error(
+        error.response?.data?.message || "Failed to request access"
+      );
+    },
+  });
+
+  const handleRequestAccess = () => {
+    requestAccessMutation.mutate();
   };
 
   if (isLoading) return <p className="text-center mt-4">Loading...</p>;
@@ -137,7 +179,8 @@ export const CapsuleDetails = () => {
           </div>
         </div>
 
-        {canPost && (
+        {/* Either show the Create Post form or the Request Access button */}
+        {canPost ? (
           <div className="bg-white shadow-lg rounded-lg p-6 w-1/3">
             <h3 className="text-2xl font-bold text-blue-700">Create a Post</h3>
             <form onSubmit={handlePostSubmit} className="mt-4 space-y-4">
@@ -175,11 +218,27 @@ export const CapsuleDetails = () => {
               </button>
             </form>
           </div>
+        ) : (
+          // If user cannot post but can request access, display button.
+          capsule.viewRights === "specificPeople" &&
+          canRequestAccess && (
+            <div className="bg-white shadow-lg rounded-lg p-6 w-1/3 flex flex-col items-center justify-center">
+              <button
+                onClick={handleRequestAccess}
+                disabled={requestAccessMutation.isLoading}
+                className="px-4 py-2 bg-green-600 text-white rounded-lg"
+              >
+                {requestAccessMutation.isLoading
+                  ? "Requesting..."
+                  : "Request Access"}
+              </button>
+            </div>
+          )
         )}
       </div>
 
       {/* Display posts only if capsule is not locked */}
-      {!capsule.locked && (
+      {!capsule.locked && canPost && (
         <div className="mt-8 w-5/6 bg-white shadow-lg rounded-lg p-6">
           <h3 className="text-2xl font-bold text-blue-700 mb-4">User Posts</h3>
           {postsLoading ? (
@@ -193,7 +252,10 @@ export const CapsuleDetails = () => {
               ) : (
                 postsData.pages.flatMap((page) =>
                   page.posts.map((post, index) => (
-                    <div key={post._id || index} className="p-4 border-b last:border-b-0">
+                    <div
+                      key={post._id || index}
+                      className="p-4 border-b last:border-b-0"
+                    >
                       <h4 className="text-lg font-semibold">{post.title}</h4>
                       <p className="text-gray-700">{post.content}</p>
                     </div>

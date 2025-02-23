@@ -2,9 +2,12 @@ import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast, { Toaster } from "react-hot-toast";
 import axios from "axios";
+import { useRecoilValue , useSetRecoilState} from "recoil";
 
 export const StudentProfileForm = ({ onSuccess }) => {
     const url = `${import.meta.env.VITE_PROFILE_API_URL}/profile-upload`;
+    const profileState = useRecoilValue(profileState)
+    const setProfileState = useSetRecoilState(profileState)
     const queryClient = useQueryClient();
 
     const [formData, setFormData] = useState({
@@ -22,10 +25,14 @@ export const StudentProfileForm = ({ onSuccess }) => {
         onSuccess: (data) => {
             if (data.success) {
                 toast.success("Profile updated successfully!");
-                queryClient.invalidateQueries(["profile"]); // Refresh profile
-                onSuccess(); // Close form and show updated profile
+                queryClient.invalidateQueries(["profile"]);
+                onSuccess(); 
             } else {
                 toast.error(data.message);
+                setProfileState({
+                    isAvailable : true,
+                    profile : data.profile
+                })
             }
         },
         onError: (error) => {

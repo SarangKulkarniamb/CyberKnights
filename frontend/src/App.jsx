@@ -14,6 +14,11 @@ import {CreateTimeCapsule} from './components/Dashboard/CreateTimeCapsule'
 import {ProfileView} from './components/Dashboard/ProfileView'
 import { ExploreCapsules } from './components/Dashboard/ExploreCapsules'
 import { CapsuleDetails } from './components/Dashboard/CapsuleDetails'
+import { Outlet } from 'react-router-dom'
+import { profileState } from './atoms/profileAtom'
+import axios from 'axios'
+import { useSetRecoilState } from 'recoil'
+import { useQuery } from '@tanstack/react-query'
 // Protected route component
 const Protected = ({ children, isPublic = false }) => {
   const auth = useRecoilValue(authState);
@@ -31,25 +36,47 @@ const Protected = ({ children, isPublic = false }) => {
   return children;
 };
 
+
+const RequireProfile = () => {
+  const setProfileState = useSetRecoilState(profileState);
+  const { data: profile, isLoading, error } = useQuery({
+    queryKey: ["profile"],
+    queryFn: async () => {
+        const response = await axios.get(`${import.meta.env.VITE_PROFILE_API_URL}/me`, { withCredentials: true });
+        setProfileState({
+            isAvailable: true,
+            profile: response.data.profile,
+        })
+        return response.data.profile;
+    },
+  });
+  const userProfile = useRecoilValue(profileState);
+  return userProfile.profile ? <Outlet /> : <Navigate to="profile" replace />;
+};
+
 const App = () => {
   return (
     <>
       <CheckAuthStatus />
 
       <Routes>
-        {/* Public Routes */}
+
         <Route path="/" element={<Protected isPublic={true}><Homepage /></Protected>} />
         <Route path="/login" element={<Protected isPublic={true}><Loginpage /></Protected>} />
         <Route path="/register" element={<Protected isPublic={true}><Registerpage /></Protected>} />
         <Route path="/verify" element={<Protected isPublic={true}><Verification /></Protected>} />
 
-        {/* Protected Dashboard Route with Nested Routes */}
         <Route path="/dashboard" element={<Protected><Dashboard /></Protected>}>
-          <Route path="" element={<MainBody />} />
+
           <Route path="profile" element={<ProfileView />} />
-          <Route path="create-capsule" element={<CreateTimeCapsule/>} />
-          <Route path="explore-capsules" element={<ExploreCapsules/>} />
-          <Route path="capsule/:id" element={<CapsuleDetails />} />
+          
+          {/* All other dashboard routes require an existing profile */}
+          <Route element={<RequireProfile />}>
+            <Route path="" element={<MainBody />} />
+            <Route path="create-capsule" element={<CreateTimeCapsule />} />
+            <Route path="explore-capsules" element={<ExploreCapsules />} />
+            <Route path="capsule/:id" element={<CapsuleDetails />} />
+          </Route>
         </Route>
         
         <Route path="/logout" element={<Protected><Logout /></Protected>} />
@@ -61,7 +88,8 @@ const App = () => {
         <Route path="*" element={<Navigate to="/unauth" />} />
       </Routes>
     </>
-  )
-}
+  );
+};
 
-export default App
+export default App;
+
