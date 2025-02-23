@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
@@ -26,6 +26,13 @@ export const ProfileView = () => {
     },
     retry: false,
   });
+
+  // Automatically show edit form if profile is null
+  useEffect(() => {
+    if (!profile) {
+      setIsEditing(true);
+    }
+  }, [profile]);
 
   // Fetch user's capsules and posts using the /api/user-content endpoint
   const {
@@ -78,8 +85,7 @@ export const ProfileView = () => {
   };
 
   if (profileLoading || contentLoading) return <div>Loading...</div>;
-  if (profileError) return <div>Error loading profile.</div>;
-
+ 
   // Achievements: use userContent data; if not available, default to 0.
   const capsuleCount = userContent?.capsules ? userContent.capsules.length : 0;
   const postsCount = userContent?.posts ? userContent.posts.length : 0;

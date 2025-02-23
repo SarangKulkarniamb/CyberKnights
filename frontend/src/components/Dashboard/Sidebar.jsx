@@ -20,9 +20,7 @@ function Sidebar({ isOpen, toggleSidebar }) {
         <Link to="profile" className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-700">
           <User size={20} /> {isOpen && "Profile"}
         </Link>
-        <Link to="settings" className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-700">
-          <Settings size={20} /> {isOpen && "Settings"}
-        </Link>
+        
 
         {/* Logout Button */}
         <Link to="/logout" className="flex items-center gap-2 p-2 mt-auto rounded-lg hover:bg-red-600">

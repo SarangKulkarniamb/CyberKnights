@@ -15,4 +15,5 @@ router.post('/forgot-password', forgotPassword)
 router.post('/reset-password/:token' , resetPassword)
 
 router.get('/check-auth' , check_auth)
+
 export default router

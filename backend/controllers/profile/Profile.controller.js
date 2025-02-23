@@ -1,4 +1,4 @@
-
+import { User } from "../../models/user.model.js"
 import { Profile } from "../../models/profile.model.js"
 import { Capsule } from "../../models/Capsule.model.js";
 import  Post  from "../../models/Post.model.js";
@@ -95,3 +95,16 @@ export const getUserContent = async (req, res) => {
     res.status(500).json({ success: false, message: "Failed to fetch user content" });
   }
 };
+
+
+export const getUser = async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id).select('-password')
+        if(!user){
+            return res.status(404).json({success: false, message: 'User not found'})
+        }
+        res.status(200).json({success: true, user})
+    } catch (error) {
+        return res.status(500).json({success: false, message: 'Internal server error'})
+    }
+}

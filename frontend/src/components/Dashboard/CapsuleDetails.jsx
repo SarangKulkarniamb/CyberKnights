@@ -51,8 +51,7 @@ export const CapsuleDetails = () => {
     capsule &&
     (capsule.viewRights === "public" ||
       (capsule.Admin && capsule.Admin.toString() === userId) ||
-      (capsule.viewRights === "specificPeople" &&
-        capsule.access?.includes(userId)));
+        capsule.access?.includes(userId));
 
   const alreadyRequested = capsule?.requests?.includes(userId);
   const canRequestAccess =
@@ -306,6 +305,7 @@ export const CapsuleDetails = () => {
                       key={post._id || index}
                       className="p-4 border-b last:border-b-0"
                     >
+                      <img src={post.media} alt="" />
                       <h4 className="text-lg font-semibold">{post.title}</h4>
                       <p className="text-gray-700">{post.content}</p>
                     </div>

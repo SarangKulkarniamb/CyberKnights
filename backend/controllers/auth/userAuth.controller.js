@@ -206,3 +206,16 @@ export const check_auth = async (req, res) => {
       return res.status(401).json({ success: false, message: 'Invalid or expired token' });
     }
 };
+
+
+export const getUser = async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id).select('-password')
+        if(!user){
+            return res.status(404).json({success: false, message: 'User not found'})
+        }
+        res.status(200).json({success: true, user})
+    } catch (error) {
+        return res.status(500).json({success: false, message: 'Internal server error'})
+    }
+}
