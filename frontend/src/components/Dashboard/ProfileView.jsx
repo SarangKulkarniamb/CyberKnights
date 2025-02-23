@@ -3,9 +3,7 @@ import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
 import { useSetRecoilState } from "recoil";
-import { profileState } from "../../atoms/profileAtom"
-
-
+import { profileState } from "../../atoms/profileAtom";
 
 export const ProfileView = () => {
     const [isEditing, setIsEditing] = useState(false);
@@ -19,7 +17,7 @@ export const ProfileView = () => {
             setProfileState({
                 isAvailable: true,
                 profile: response.data.profile,
-            })
+            });
             return response.data.profile;
         },
     });
@@ -44,6 +42,15 @@ export const ProfileView = () => {
         },
     });
 
+    const formatDOB = (dob) => {
+        if (!dob) return ""; 
+        const date = new Date(dob);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        return `${day}-${month}-${year}`;
+    };
+
     if (isLoading) return <div>Loading...</div>;
 
     if (!profile) {
@@ -56,24 +63,45 @@ export const ProfileView = () => {
     }
 
     return (
-        <div className="max-w-md mx-auto mt-10 p-6 bg-white shadow-md rounded-lg">
+        <div className="max-w-6xl mx-auto mt-10 p-6 bg-white shadow-md rounded-lg flex gap-6">
             <Toaster />
-            {!isEditing ? (
-                <div>
-                    <h1 className="text-2xl font-bold text-center mb-4">Profile</h1>
-                    <p><strong>Name:</strong> {profile?.displayName}</p>
-                    <p><strong>DOB:</strong> {profile?.dob}</p>
-                    <p><strong>Bio:</strong> {profile?.bio}</p>
-                    <button
-                        className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none"
-                        onClick={() => setIsEditing(true)}
-                    >
-                        Edit Profile
-                    </button>
+            {/* Profile Details */}
+            <div className="flex-1">
+                {!isEditing ? (
+                    <div>
+                        <h1 className="text-2xl font-bold text-center mb-4">Profile</h1>
+                        <div className="flex items-center space-x-4 mb-4">
+                            <img
+                                src={profile?.profilePic || "https://via.placeholder.com/150"}
+                                alt="Profile"
+                                className="w-24 h-24 rounded-full object-cover"
+                            />
+                            <div>
+                                <p className="text-xl font-semibold">{profile?.displayName}</p>
+                                <p className="text-gray-600">{profile?.bio}</p>
+                            </div>
+                        </div>
+                        <p><strong>DOB:</strong> {formatDOB(profile?.dob)}</p>
+                        <button
+                            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none"
+                            onClick={() => setIsEditing(true)}
+                        >
+                            Edit Profile
+                        </button>
+                    </div>
+                ) : (
+                    <ProfileEditForm profile={profile} mutation={mutation} onCancel={() => setIsEditing(false)} />
+                )}
+            </div>
+
+            {/* Achievements Block */}
+            <div className="flex-1 bg-gray-50 p-6 rounded-lg">
+                <h2 className="text-2xl font-bold text-center mb-4">Achievements</h2>
+                <div className="text-center">
+                    <p className="text-4xl font-bold text-blue-600">{profile?.capsules?.length || 0}</p>
+                    <p className="text-gray-600">Capsules Created</p>
                 </div>
-            ) : (
-                <ProfileEditForm profile={profile} mutation={mutation} onCancel={() => setIsEditing(false)} />
-            )}
+            </div>
         </div>
     );
 };
@@ -81,7 +109,7 @@ export const ProfileView = () => {
 const ProfileEditForm = ({ profile, mutation, onCancel }) => {
     const [formData, setFormData] = useState({
         name: profile?.displayName || "",
-        dob: profile?.dob || "",
+        dob: profile?.dob ? new Date(profile.dob).toISOString().split("T")[0] : "", 
         bio: profile?.bio || "",
         profilePic: null,
     });
