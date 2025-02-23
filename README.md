@@ -9,35 +9,35 @@ Time Capsule is a web platform that allows users to create, store, and share dig
 
 Frontend:
 
-React (Vite)
-
-Tailwind CSS
-
-React Query
-
-Recoil (State Management)
-
-React Router
+    React (Vite)
+    
+    Tailwind CSS
+    
+    React Query
+    
+    Recoil (State Management)
+    
+    React Router
 
 Backend:
 
-Node.js with Express.js
-
-MongoDB with Mongoose
-
-Cloudinary (for image & video uploads)
-
-JSON Web Tokens (JWT) for Authentication
-
-Other Tools & Services:
-
-Axios (API requests)
-
-bcrypt.js (Password hashing)
-
-Multer (File uploads)
-
-dotenv (Environment variables)
+    Node.js with Express.js
+    
+    MongoDB with Mongoose
+    
+    Cloudinary (for image & video uploads)
+    
+    JSON Web Tokens (JWT) for Authentication
+    
+    Other Tools & Services:
+    
+    Axios (API requests)
+    
+    bcrypt.js (Password hashing)
+    
+    Multer (File uploads)
+    
+    dotenv (Environment variables)
 
 📌 Features
 
