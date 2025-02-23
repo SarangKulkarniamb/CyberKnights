@@ -13,7 +13,8 @@ export function Nav() {
         `${import.meta.env.VITE_PROFILE_API_URL}/me`,
         { withCredentials: true }
       );
-      setProfileState(response.data.profile)
+      
+      setProfileState({ profile: response.data.profile });
       console.log("Fetched profile:", response.data.profile);
       return response.data.profile;
     },

@@ -62,3 +62,59 @@ export const PostUpload = async (req, res) => {
     });
   }
 };
+
+export const posts = async (req, res) => {
+  const { page = 1, limit = 5, capsuleId } = req.query;
+  const pageNum = parseInt(page, 10);
+  const limitNum = parseInt(limit, 10);
+
+  const query = {};
+  if (capsuleId) {
+    query.capsule = capsuleId;
+  }
+
+  try {
+    const posts = await Post.find(query)
+      .sort({ createdAt: -1 })
+      .skip((pageNum - 1) * limitNum)
+      .limit(limitNum);
+    const totalPosts = await Post.countDocuments(query);
+
+    res.status(200).json({
+      success: true,
+      posts,
+      hasMore: pageNum * limitNum < totalPosts,
+    });
+  } catch (error) {
+    console.error("Error fetching posts:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch posts",
+    });
+  }
+};
+
+export const post = async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+    if (!post) {
+      return res.status(404).json({
+        success: false,
+        message: "Post not found",
+      });
+    }
+    res.status(200).json({
+      success: true,
+      post,
+    });
+  } catch (error) {
+    console.error("Error fetching post:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch post",
+    });
+  }
+};
+
+
+

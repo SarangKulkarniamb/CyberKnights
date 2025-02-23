@@ -3,7 +3,7 @@ import { Profile } from "../../models/profile.model.js";
 
 export const CapsuleUpload = async (req, res) => {
   try {
-    const { Description, CapsuleName, viewRights } = req.body;
+    const { Description, CapsuleName, viewRights, locked, lockedUntil } = req.body;
     if (!CapsuleName || !Description || !viewRights) {
       return res.status(400).json({ success: false, message: "Missing required fields" });
     }
@@ -14,7 +14,15 @@ export const CapsuleUpload = async (req, res) => {
       return res.status(401).json({ success: false, message: "Unauthorized" });
     }
 
-    const capsule = await Capsule.create({ Description, banner, CapsuleName, viewRights, Admin });
+    const capsule = await Capsule.create({
+      Description,
+      banner,
+      CapsuleName,
+      viewRights,
+      Admin,
+      locked: locked === "true" || locked === true,
+      lockedUntil: lockedUntil ? new Date(lockedUntil) : undefined,
+    });
 
     res.status(200).json({ success: true, message: "Capsule uploaded", capsule });
   } catch (error) {
@@ -22,6 +30,7 @@ export const CapsuleUpload = async (req, res) => {
     res.status(500).json({ success: false, message: "Failed to upload capsule" });
   }
 };
+
 
 export const getCapsules = async (req, res) => {
   try {
@@ -61,30 +70,39 @@ export const getCapsule = async (req, res) => {
 
 export const updateCapsule = async (req, res) => {
   try {
-    const { Description, CapsuleName, viewRights } = req.body;
-    const banner = req.file?.path;
-    const capsule = await Capsule.findByIdAndUpdate(
-      req.params.id,
-      { Description, banner, CapsuleName, viewRights },
-      { new: true }
-    );
+    const { CapsuleName, Description, viewRights, locked, lockedUntil } = req.body;
+    const updateData = {
+      CapsuleName,
+      Description,
+      viewRights,
+      locked: locked === "true" || locked === true,
+      lockedUntil: lockedUntil ? new Date(lockedUntil) : null,
+    };
 
-    if (!capsule) return res.status(404).json({ success: false, message: "Capsule not found" });
-    res.status(200).json({ success: true, message: "Capsule updated", capsule });
+    if (req.file) {
+      updateData.banner = req.file.filename;
+    }
+
+    const updatedCapsule = await Capsule.findByIdAndUpdate(req.params.id, updateData, { new: true });
+    if (!updatedCapsule) {
+      return res.status(404).json({ message: "Capsule not found" });
+    }
+    res.json(updatedCapsule);
   } catch (error) {
-    console.error("Error updating capsule:", error);
-    res.status(500).json({ success: false, message: "Failed to update capsule" });
+    res.status(500).json({ message: error.message });
   }
 };
 
+
 export const deleteCapsule = async (req, res) => {
   try {
-    const capsule = await Capsule.findByIdAndDelete(req.params.id);
-    if (!capsule) return res.status(404).json({ success: false, message: "Capsule not found" });
-    res.status(200).json({ success: true, message: "Capsule deleted" });
+    const deletedCapsule = await Capsule.findByIdAndDelete(req.params.id);
+    if (!deletedCapsule) {
+      return res.status(404).json({ message: "Capsule not found" });
+    }
+    res.json({ message: "Capsule deleted successfully" });
   } catch (error) {
-    console.error("Error deleting capsule:", error);
-    res.status(500).json({ success: false, message: "Failed to delete capsule" });
+    res.status(500).json({ message: error.message });
   }
 };
 

@@ -1,12 +1,13 @@
-import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
-import { FaLeaf } from "react-icons/fa";
+import { useParams, useNavigate } from "react-router-dom";
 
-export const CreateTimeCapsule = () => {
-  const [loading, setLoading] = useState(false)
-  const url = `${import.meta.env.VITE_CAPSULE_API_URL}/Capsule-upload`;
+export const UpdateTimeCapsule = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const url = `${import.meta.env.VITE_CAPSULE_API_URL}`;
 
   const [formData, setFormData] = useState({
     CapsuleName: "",
@@ -18,6 +19,26 @@ export const CreateTimeCapsule = () => {
   });
 
   const [errors, setErrors] = useState({});
+
+  const { data: capsule, isLoading, error } = useQuery(["capsule", id], async () => {
+    const response = await axios.get(`${url}/Capsule/${id}`, { withCredentials: true });
+    return response.data;
+  });
+
+  useEffect(() => {
+    if (capsule) {
+      setFormData({
+        CapsuleName: capsule.CapsuleName,
+        Description: capsule.Description,
+        banner: null,
+        viewRights: capsule.viewRights,
+        locked: capsule.locked,
+        lockedUntil: capsule.lockedUntil
+          ? new Date(capsule.lockedUntil).toISOString().slice(0, 16)
+          : "",
+      });
+    }
+  }, [capsule]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -52,7 +73,7 @@ export const CreateTimeCapsule = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const createCapsuleMutation = useMutation({
+  const updateCapsuleMutation = useMutation({
     mutationFn: async (data) => {
       const formDataToSend = new FormData();
       formDataToSend.append("CapsuleName", data.CapsuleName);
@@ -65,50 +86,57 @@ export const CreateTimeCapsule = () => {
         formDataToSend.append("banner", data.banner);
       }
 
-      // Artificial delay for testing (2 seconds)
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-
-      const response = await axios.post(url, formDataToSend, {
+      const response = await axios.put(`${url}/Capsule-update/${id}`, formDataToSend, {
         headers: { "Content-Type": "multipart/form-data" },
         withCredentials: true,
       });
       return response.data;
     },
     onSuccess: () => {
-      setLoading(false)
-      toast.success("Capsule created successfully!");
-      setFormData({
-        CapsuleName: "",
-        Description: "",
-        banner: null,
-        viewRights: "onlyMe",
-        locked: false,
-        lockedUntil: "",
-      });
-      setErrors({});
+      toast.success("Capsule updated successfully!");
+      navigate(`/capsule/${id}`);
     },
     onError: (error) => {
-      setLoading(false)
-      toast.error(error.response?.data?.message || "Failed to create capsule.");
+      toast.error(error.response?.data?.message || "Failed to update capsule.");
     },
   });
 
   const handleSubmit = (e) => {
-    setLoading(true)
     e.preventDefault();
     if (!validateForm()) {
       toast.error("Please fix the errors in the form.");
       return;
     }
-    createCapsuleMutation.mutate(formData);
+    updateCapsuleMutation.mutate(formData);
   };
+
+  const deleteCapsuleMutation = useMutation({
+    mutationFn: async () => {
+      const response = await axios.delete(`${url}/Capsule-delete/${id}`, { withCredentials: true });
+      return response.data;
+    },
+    onSuccess: () => {
+      toast.success("Capsule deleted successfully!");
+      navigate("/capsules");
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.message || "Failed to delete capsule.");
+    },
+  });
+
+  const handleDelete = () => {
+    if (window.confirm("Are you sure you want to delete this capsule?")) {
+      deleteCapsuleMutation.mutate();
+    }
+  };
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error fetching capsule details.</div>;
 
   return (
     <div className="max-w-2xl mx-auto p-6 bg-white shadow-md rounded-lg mt-10">
       <Toaster />
-      <h2 className="text-3xl font-bold text-center text-blue-700 mb-6">
-        Create a Time Capsule
-      </h2>
+      <h2 className="text-3xl font-bold text-center text-blue-700 mb-6">Update Time Capsule</h2>
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
           <label className="block text-gray-700 font-semibold">Capsule Name</label>
@@ -118,13 +146,9 @@ export const CreateTimeCapsule = () => {
             value={formData.CapsuleName}
             onChange={handleChange}
             required
-            className={`w-full px-4 py-2 border rounded-lg focus:ring-blue-500 ${
-              errors.CapsuleName ? "border-red-500" : ""
-            }`}
+            className={`w-full px-4 py-2 border rounded-lg focus:ring-blue-500 ${errors.CapsuleName ? "border-red-500" : ""}`}
           />
-          {errors.CapsuleName && (
-            <p className="text-red-500 text-sm mt-1">{errors.CapsuleName}</p>
-          )}
+          {errors.CapsuleName && <p className="text-red-500 text-sm mt-1">{errors.CapsuleName}</p>}
         </div>
 
         <div>
@@ -135,13 +159,9 @@ export const CreateTimeCapsule = () => {
             value={formData.Description}
             onChange={handleChange}
             required
-            className={`w-full px-4 py-2 border rounded-lg focus:ring-blue-500 ${
-              errors.Description ? "border-red-500" : ""
-            }`}
+            className={`w-full px-4 py-2 border rounded-lg focus:ring-blue-500 ${errors.Description ? "border-red-500" : ""}`}
           ></textarea>
-          {errors.Description && (
-            <p className="text-red-500 text-sm mt-1">{errors.Description}</p>
-          )}
+          {errors.Description && <p className="text-red-500 text-sm mt-1">{errors.Description}</p>}
         </div>
 
         <div>
@@ -151,13 +171,9 @@ export const CreateTimeCapsule = () => {
             name="banner"
             accept="image/*"
             onChange={handleFileChange}
-            className={`w-full px-4 py-2 border rounded-lg cursor-pointer focus:ring-blue-500 ${
-              errors.banner ? "border-red-500" : ""
-            }`}
+            className={`w-full px-4 py-2 border rounded-lg cursor-pointer focus:ring-blue-500 ${errors.banner ? "border-red-500" : ""}`}
           />
-          {errors.banner && (
-            <p className="text-red-500 text-sm mt-1">{errors.banner}</p>
-          )}
+          {errors.banner && <p className="text-red-500 text-sm mt-1">{errors.banner}</p>}
         </div>
 
         <div>
@@ -199,15 +215,26 @@ export const CreateTimeCapsule = () => {
         <div className="text-center">
           <button
             type="submit"
-            disabled={createCapsuleMutation.isLoading}
+            disabled={updateCapsuleMutation.isLoading}
             className={`bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 ${
-              createCapsuleMutation.isLoading ? "opacity-50 cursor-not-allowed" : ""
+              updateCapsuleMutation.isLoading ? "opacity-50 cursor-not-allowed" : ""
             }`}
           >
-            {loading ? "Creating..." : "Create Capsule"}
+            {updateCapsuleMutation.isLoading ? "Updating..." : "Update Capsule"}
           </button>
         </div>
       </form>
+      <div className="mt-4 text-center">
+        <button
+          onClick={handleDelete}
+          disabled={deleteCapsuleMutation.isLoading}
+          className={`bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 ${
+            deleteCapsuleMutation.isLoading ? "opacity-50 cursor-not-allowed" : ""
+          }`}
+        >
+          {deleteCapsuleMutation.isLoading ? "Deleting..." : "Delete Capsule"}
+        </button>
+      </div>
     </div>
   );
 };
