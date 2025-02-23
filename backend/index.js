@@ -18,9 +18,6 @@ app.use(cors({ origin: "http://localhost:5173", credentials: true }));
 app.use(cookieParser())
 app.use(express.json({limit: '50mb'}))
 app.use(express.urlencoded({ extended: true , limit: '50mb'}))
-app.get('/', (req, res) => {
-    res.send('Hello World!')
-})
 
 app.use("/api/auth", userAuthRouter)
 app.use("/api/profile",studentProfile)
