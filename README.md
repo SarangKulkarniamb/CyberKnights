@@ -56,9 +56,15 @@ Search & Filter – Easily find past and future capsules.
 
 PROJECT INITIALISATION INSTRUCTIONS:
 
-1. In root directory , run "npm install --legacy-peer-deps"
+In Root directory :  
+    
+            npm install --legacy-peer-deps
+            
+ In frontend directory :
+ 
+     run "npm install"
 
-2. In frontend directory , run "npm install"
-
-3. In root directory , run  "npm run start"
+ In root directory to run the code : 
+         
+            npm run start
 
